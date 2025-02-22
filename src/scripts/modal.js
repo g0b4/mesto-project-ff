@@ -2,9 +2,7 @@
 
 let currentPopup;
 
-function registerModal(button, popup) {
-  button.addEventListener("click", () => openModal(popup));
-
+export function registerModal(popup) {
   popup
     .querySelector(".popup__close")
     .addEventListener("click", () => closeModal(popup));
@@ -14,20 +12,18 @@ function registerModal(button, popup) {
   });
 }
 
-function openModal(popup) {
+export function openModal(popup) {
   currentPopup = popup;
   popup.classList.add("popup_is-opened", "popup_is-animated");
   document.body.addEventListener("keyup", registerModalEscape);
 }
 
 function registerModalEscape(evt) {
-  if (evt.key === "Escape") currentPopup.classList.remove("popup_is-opened");
+  if (evt.key === "Escape") closeModal(currentPopup);
 }
 
-function closeModal(popup) {
+export function closeModal(popup) {
   currentPopup = null;
   popup.classList.remove("popup_is-opened");
   document.body.removeEventListener("keyup", registerModalEscape);
 }
-
-export {registerModal, openModal, closeModal} 

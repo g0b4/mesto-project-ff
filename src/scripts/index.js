@@ -1,69 +1,109 @@
+//@todo: Импорта
 import "../pages/index.css";
-import { initialCards } from "./cards";
+import {
+  initialCards,
+  createCard,
+  onDelete,
+  places,
+  handleLike,
+  imagePopup,
+} from "./cards";
 import { registerModal, openModal, closeModal } from "./modal";
 
 // @todo: Переменные
 const editPopup = document.querySelector(".popup_type_edit");
+const addCardPopup = document.querySelector(".popup_type_new-card");
 
-registerModal(
-  document.querySelector(".profile__add-button"),
-  document.querySelector(".popup_type_new-card")
-);
-registerModal(
-  document.querySelector(".profile__edit-button"),
-  document.querySelector(".popup_type_edit")
-);
+// @todo: Регистрируем модальные окна
+registerModal(editPopup);
+registerModal(addCardPopup);
+
+// @todo: Обработчики для кнопок открытия модальных окон
+document.querySelector(".profile__add-button").addEventListener("click", () => {
+  openModal(addCardPopup);
+});
+
+document
+  .querySelector(".profile__edit-button")
+  .addEventListener("click", () => {
+    nameInput.value = nameDisplay.textContent;
+    jobInput.value = jobDisplay.textContent;
+    openModal(editPopup);
+  });
+
+function handleImageClick(name, link) {
+  imagePopup.querySelector(".popup__image").setAttribute("src", link);
+  imagePopup.querySelector(".popup__image").setAttribute("alt", name);
+  imagePopup.querySelector(".popup__caption").textContent = name;
+  openModal(imagePopup);
+}
 
 // @todo: Функция изменения профиля
 
-let name = "Жак-Ив Кусто";
-let job = "Исследователь океана";
-const formElement = document.querySelector(".popup__form");
+const formElement = document.querySelector(".popup_type_edit");
 const nameDisplay = document.querySelector(".profile__title");
 const nameInput = document.querySelector(".popup__input_type_name");
 const jobDisplay = document.querySelector(".profile__description");
 const jobInput = document.querySelector(".popup__input_type_description");
 const editorButton = document.querySelector(".profile__edit-button");
-function updateContent() {
+
+function updateProfileContent(name, job) {
   nameDisplay.textContent = name;
-  nameInput.value = name;
   jobDisplay.textContent = job;
-  jobInput.value = job;
 }
-function updateJob(newJob) {
-  job = newJob;
-}
-function updateName(newName) {
-  name = newName;
-}
+
 editorButton.addEventListener("click", () => {
+  nameInput.value = nameDisplay.textContent;
+  jobInput.value = jobDisplay.textContent;
   openModal(editPopup);
-  updateContent();
 });
-function handleFormSubmit(evt) {
+
+function handleFormSubmitEdit(evt) {
   evt.preventDefault();
-  updateName(nameInput.value);
-  updateJob(jobInput.value);
-  updateContent();
+  updateProfileContent(nameInput.value, jobInput.value);
   closeModal(editPopup);
 }
-formElement.addEventListener("submit", handleFormSubmit);
+formElement.addEventListener("submit", handleFormSubmitEdit);
 
 // @todo: Функция добавления карточки пользователем
 
-const addCardPopup = document.querySelector(".popup_type_new-card");
 const addCardForm = addCardPopup.querySelector(".popup__form");
-const cardNameInput = addCardPopup.querySelector(".popup__input_type_card-name");
+const cardNameInput = addCardPopup.querySelector(
+  ".popup__input_type_card-name"
+);
 const cardLinkInput = addCardPopup.querySelector(".popup__input_type_url");
 
 function handleAddCardFormSubmit(evt) {
   evt.preventDefault();
   const cardName = cardNameInput.value;
   const cardLink = cardLinkInput.value;
-  const newCard = createCard(cardName, cardLink, onDelete);
+  const newCard = createCard(
+    cardName,
+    cardLink,
+    onDelete,
+    handleLike,
+    handleImageClick
+  );
   places.prepend(newCard);
   addCardForm.reset();
   closeModal(addCardPopup);
 }
 
 addCardForm.addEventListener("submit", handleAddCardFormSubmit);
+
+//@todo: Рендер карточек
+
+function renderCards() {
+  initialCards.forEach((cardData) => {
+    const cardElement = createCard(
+      cardData.name,
+      cardData.link,
+      onDelete,
+      handleLike,
+      handleImageClick
+    );
+    places.appendChild(cardElement);
+  });
+}
+
+renderCards();
