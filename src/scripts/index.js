@@ -4,15 +4,17 @@ import {
   initialCards,
   createCard,
   onDelete,
-  places,
   handleLike,
-  imagePopup,
 } from "./cards";
 import { registerModal, openModal, closeModal } from "./modal";
 
 // @todo: Переменные
 const editPopup = document.querySelector(".popup_type_edit");
 const addCardPopup = document.querySelector(".popup_type_new-card");
+const places = document.querySelector(".places__list");
+const imagePopup = document.querySelector(".popup_type_image");
+
+registerModal(imagePopup);
 
 // @todo: Регистрируем модальные окна
 registerModal(editPopup);

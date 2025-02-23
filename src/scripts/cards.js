@@ -1,8 +1,5 @@
 // @todo: Переменные
 const cardTemplate = document.querySelector("#card-template").content;
-export const imagePopup = document.querySelector(".popup_type_image");
-import { openModal, closeModal, registerModal } from "./modal";
-export const places = document.querySelector(".places__list");
 
 
 export const initialCards = [
@@ -32,7 +29,7 @@ export const initialCards = [
   },
 ];
 
-registerModal(imagePopup);
+
 
 // @todo: Функция создания карточки
 export function createCard(name, link, onDelete, handleLike, handleImageClick) {
