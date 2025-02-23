@@ -4,12 +4,6 @@ export const imagePopup = document.querySelector(".popup_type_image");
 import { openModal, closeModal, registerModal } from "./modal";
 export const places = document.querySelector(".places__list");
 
-function handleImageClick(name, link) {
-  imagePopup.querySelector(".popup__image").setAttribute("src", link);
-  imagePopup.querySelector(".popup__image").setAttribute("alt", name);
-  imagePopup.querySelector(".popup__caption").textContent = name;
-  openModal(imagePopup);
-}
 
 export const initialCards = [
   {
@@ -38,13 +32,7 @@ export const initialCards = [
   },
 ];
 
-imagePopup
-  .querySelector(".popup__close")
-  .addEventListener("click", () => closeModal(imagePopup));
-
-imagePopup.addEventListener("click", (evt) => {
-  if (evt.target === imagePopup) closeModal(imagePopup);
-});
+registerModal(imagePopup);
 
 // @todo: Функция создания карточки
 export function createCard(name, link, onDelete, handleLike, handleImageClick) {

@@ -23,14 +23,6 @@ document.querySelector(".profile__add-button").addEventListener("click", () => {
   openModal(addCardPopup);
 });
 
-document
-  .querySelector(".profile__edit-button")
-  .addEventListener("click", () => {
-    nameInput.value = nameDisplay.textContent;
-    jobInput.value = jobDisplay.textContent;
-    openModal(editPopup);
-  });
-
 function handleImageClick(name, link) {
   imagePopup.querySelector(".popup__image").setAttribute("src", link);
   imagePopup.querySelector(".popup__image").setAttribute("alt", name);
