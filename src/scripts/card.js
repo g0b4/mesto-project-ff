@@ -39,7 +39,7 @@ export function createCard(cards, callbacksObject, userId) {
   });
 
   cardImage.addEventListener("click", () => {
-    openImageCallback(cardImage, popupImage, popupImageCaption, buttonTypeCard);
+    openImageCallback(cardImage); 
   });
 
   return cardElement;

@@ -18,6 +18,9 @@ import {
   avatarForm,
   avatarImage,
   deleteCardForm,
+  popupImage,
+  popupImageCaption,
+  buttonTypeCard,
 } from "./constats.js";
 import { validation, clearValidation, validationConfig } from "./validation.js";
 import { getCards, getUser } from "./api.js";
@@ -32,11 +35,11 @@ import {
 // Инициализация валидации
 validation(validationConfig);
 
-function openImagePopup(cardImg, popupImage, popupImageCaption, popupType) {
+function openImagePopup(cardImg) {
   popupImage.src = cardImg.src;
   popupImage.alt = cardImg.alt;
   popupImageCaption.textContent = cardImg.alt;
-  openPopup(popupType);
+  openPopup(buttonTypeCard);
 }
 
 const callbacksObject = {

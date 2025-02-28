@@ -9,11 +9,6 @@ import {
 } from "../constats.js";
 import { handleSubmit } from "./utilsForms.js";
 
-function renderCard(item, method = "prepend") {
-  const cardElement = createCard(item, callbacks);
-  cardList[method](cardElement);
-}
-
 export function handleNewCardFormSubmit(event, callbacksObject, userId) {
   function makeRequest() {
     return postCard(newPlaceNameInput.value, newLinkInput.value).then(
