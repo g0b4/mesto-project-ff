@@ -1,103 +1,108 @@
-//@todo: Импорта
 import "../pages/index.css";
 import {
-  initialCards,
-  createCard,
-  onDelete,
-  handleLike,
-} from "./cards";
-import { registerModal, openModal, closeModal } from "./modal";
+  handleOverlayClick,
+  openPopup,
+  handleCloseButtonClick,
+} from "./modal.js";
+import { createCard, handleLikes } from "./card.js";
+import {
+  popupsArray,
+  placesList,
+  editForm,
+  editFormElement,
+  profileEditButton,
+  userNameElement,
+  userJobElement,
+  newCardForm,
+  profileAddButton,
+  avatarForm,
+  avatarImage,
+  deleteCardForm,
+} from "./constats.js";
+import { validation, clearValidation, validationConfig } from "./validation.js";
+import { getCards, getUser } from "./api.js";
+import { handleCardDelete, openPopupDelete } from "./forms/deleteForm.js";
+import { handleAvatarFormSubmit } from "./forms/avatarForm.js";
+import { handleNewCardFormSubmit } from "./forms/newCardsForm.js";
+import {
+  handleFormSubmit,
+  setInitialEditProfileFormValues,
+} from "./forms/editForm.js";
 
-// @todo: Переменные
-const editPopup = document.querySelector(".popup_type_edit");
-const addCardPopup = document.querySelector(".popup_type_new-card");
-const places = document.querySelector(".places__list");
-const imagePopup = document.querySelector(".popup_type_image");
+// Инициализация валидации
+validation(validationConfig);
 
-registerModal(imagePopup);
+function openImagePopup(cardImg, popupImage, popupImageCaption, popupType) {
+  popupImage.src = cardImg.src;
+  popupImage.alt = cardImg.alt;
+  popupImageCaption.textContent = cardImg.alt;
+  openPopup(popupType);
+}
 
-// @todo: Регистрируем модальные окна
-registerModal(editPopup);
-registerModal(addCardPopup);
+const callbacksObject = {
+  deleteCardCallback: openPopupDelete,
+  openImageCallback: openImagePopup,
+  handleLikesCallback: handleLikes,
+};
 
-// @todo: Обработчики для кнопок открытия модальных окон
-document.querySelector(".profile__add-button").addEventListener("click", () => {
-  openModal(addCardPopup);
+// Обработчик открытия попапа редактирования профиля
+profileEditButton.addEventListener("click", () => {
+  clearValidation(editFormElement, validationConfig);
+  setInitialEditProfileFormValues();
+  openPopup(editForm);
 });
 
-function handleImageClick(name, link) {
-  imagePopup.querySelector(".popup__image").setAttribute("src", link);
-  imagePopup.querySelector(".popup__image").setAttribute("alt", name);
-  imagePopup.querySelector(".popup__caption").textContent = name;
-  openModal(imagePopup);
-}
-
-// @todo: Функция изменения профиля
-
-const formElement = document.querySelector(".popup_type_edit");
-const nameDisplay = document.querySelector(".profile__title");
-const nameInput = document.querySelector(".popup__input_type_name");
-const jobDisplay = document.querySelector(".profile__description");
-const jobInput = document.querySelector(".popup__input_type_description");
-const editorButton = document.querySelector(".profile__edit-button");
-
-function updateProfileContent(name, job) {
-  nameDisplay.textContent = name;
-  jobDisplay.textContent = job;
-}
-
-editorButton.addEventListener("click", () => {
-  nameInput.value = nameDisplay.textContent;
-  jobInput.value = jobDisplay.textContent;
-  openModal(editPopup);
+// Обработчик открытия попапа добавления новой карточки
+profileAddButton.addEventListener("click", () => {
+  clearValidation(newCardForm, validationConfig);
+  openPopup(newCardForm);
 });
 
-function handleFormSubmitEdit(evt) {
-  evt.preventDefault();
-  updateProfileContent(nameInput.value, jobInput.value);
-  closeModal(editPopup);
-}
-formElement.addEventListener("submit", handleFormSubmitEdit);
+// Обработчик открытия попапа обновления аватара
+avatarImage.addEventListener("click", () => {
+  clearValidation(avatarForm, validationConfig);
+  openPopup(avatarForm);
+});
 
-// @todo: Функция добавления карточки пользователем
+// Добавление обработчиков закрытия попапов
+popupsArray.forEach((popup) => {
+  const closeButton = popup.querySelector(".popup__close");
+  popup.addEventListener("click", handleOverlayClick);
+  closeButton.addEventListener("click", handleCloseButtonClick);
+});
 
-const addCardForm = addCardPopup.querySelector(".popup__form");
-const cardNameInput = addCardPopup.querySelector(
-  ".popup__input_type_card-name"
-);
-const cardLinkInput = addCardPopup.querySelector(".popup__input_type_url");
-
-function handleAddCardFormSubmit(evt) {
-  evt.preventDefault();
-  const cardName = cardNameInput.value;
-  const cardLink = cardLinkInput.value;
-  const newCard = createCard(
-    cardName,
-    cardLink,
-    onDelete,
-    handleLike,
-    handleImageClick
-  );
-  places.prepend(newCard);
-  addCardForm.reset();
-  closeModal(addCardPopup);
+// Инициализация данных пользователя
+let userId = "";
+function setUserInfo(user) {
+  userNameElement.textContent = user.name;
+  userJobElement.textContent = user.about;
+  avatarImage.setAttribute("style", `background-image: url('${user.avatar}')`);
+  userId = user._id;
 }
 
-addCardForm.addEventListener("submit", handleAddCardFormSubmit);
-
-//@todo: Рендер карточек
-
-function renderCards() {
-  initialCards.forEach((cardData) => {
-    const cardElement = createCard(
-      cardData.name,
-      cardData.link,
-      onDelete,
-      handleLike,
-      handleImageClick
-    );
-    places.appendChild(cardElement);
+// Функция для отрисовки карточек
+export function renderCards(cards, callbacksObject, userId) {
+  placesList.innerHTML = "";
+  cards.forEach((card) => {
+    const cardElement = createCard(card, callbacksObject, userId);
+    placesList.appendChild(cardElement);
   });
 }
 
-renderCards();
+// Обработчики отправки форм
+editForm.addEventListener("submit", handleFormSubmit);
+newCardForm.addEventListener("submit", (event) => {
+  handleNewCardFormSubmit(event, callbacksObject, userId);
+});
+avatarForm.addEventListener("submit", handleAvatarFormSubmit);
+deleteCardForm.addEventListener("submit", handleCardDelete);
+
+// Загрузка данных пользователя и карточек
+Promise.all([getUser(), getCards()])
+  .then(([user, cards]) => {
+    setUserInfo(user);
+    renderCards(cards, callbacksObject, user._id);
+  })
+  .catch((err) => {
+    console.error("Ошибка при загрузке данных:", err);
+  });

@@ -1,29 +1,37 @@
-// @todo: Попап
-
-let currentPopup;
-
-export function registerModal(popup) {
-  popup
-    .querySelector(".popup__close")
-    .addEventListener("click", () => closeModal(popup));
-
-  popup.addEventListener("click", (evt) => {
-    if (evt.target === popup) closeModal(popup);
-  });
+import { popupsArray } from "./constats.js";
+function handleEscClick(evt) {
+  if (evt.key === "Escape") {
+    const openedPopup = popupsArray.find((popup) =>
+      popup.classList.contains("popup_is-opened")
+    );
+    if (openedPopup) {
+      closePopup(openedPopup);
+    }
+  }
 }
 
-export function openModal(popup) {
-  currentPopup = popup;
-  popup.classList.add("popup_is-opened", "popup_is-animated");
-  document.body.addEventListener("keyup", registerModalEscape);
+function handleOverlayClick(evt) {
+  if (evt.target === evt.currentTarget) {
+    closePopup(evt.target);
+  }
 }
 
-function registerModalEscape(evt) {
-  if (evt.key === "Escape") closeModal(currentPopup);
+function handleCloseButtonClick(evt) {
+  const button = evt.target;
+  const popup = button.closest(".popup");
+  closePopup(popup);
 }
 
-export function closeModal(popup) {
-  currentPopup = null;
-  popup.classList.remove("popup_is-opened");
-  document.body.removeEventListener("keyup", registerModalEscape);
+function openPopup(popup) {
+  popup.classList.add("popup_is-opened");
+  document.addEventListener("keydown", handleEscClick);
 }
+
+function closePopup(popup) {
+  if (popup) {
+    popup.classList.remove("popup_is-opened");
+    document.removeEventListener("keydown", handleEscClick);
+  }
+}
+
+export { handleOverlayClick, closePopup, openPopup, handleCloseButtonClick };
